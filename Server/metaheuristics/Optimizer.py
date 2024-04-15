@@ -4,7 +4,7 @@
 ##The class is supposed to optimize functions with at most 4 variables
 import numpy as np
 
-class Metaheuristics:
+class Optimizer:
         
         def __init__(self, fx, constraints, method, iter_method, nb_iter, nb_iter_1exec, epsilon=0.01) -> None:
 
@@ -66,12 +66,7 @@ class Metaheuristics:
                     
                 return current_point, best_point             
 
-        def Random(self): 
-                   return
-                        
         
-        def SimulatedAnnealing(self):
-                return
         
         def initiate_values(self):
                 return 

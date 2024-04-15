@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 from typing import Iterator
 import time
-from metaheuristics import Metaheuristics
+from metaheuristics.Optimizer import Optimizer
 import numpy as np
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -61,9 +61,9 @@ def fx(x):
             return 1.7781*0.625*x[1]*x[2]**2 + 0.6224*0.625*x[0]*x[2]*x[3] + 3.1661*(0.625*x[0])**2*x[3] + 19.84*(0.625*x[0])**2*x[2]
 
 
-meta1 = Metaheuristics(fx,[],"random","monte",100,100)
+meta1 = Optimizer(fx,[],"random","monte",100,100)
 
-async def generate_metaheuristic_points(request: Request, metaheuristic: Metaheuristics) -> Iterator[str]:
+async def generate_metaheuristic_points(request: Request, metaheuristic: Optimizer) -> Iterator[str]:
 
     client_ip = request.client.host
 
@@ -88,7 +88,7 @@ async def generate_metaheuristic_points(request: Request, metaheuristic: Metaheu
         
         exec_time = time.time() - start_time
         if  exec_time < 0.042:
-            await asyncio.sleep(0.042-exec_time)
+            await asyncio.sleep(0.42-exec_time)
 
     
 
