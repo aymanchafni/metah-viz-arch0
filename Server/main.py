@@ -87,8 +87,8 @@ async def generate_metaheuristic_points(request: Request, metaheuristic: Optimiz
         yield f"data:{json_data}\n\n"
         
         exec_time = time.time() - start_time
-        if  exec_time < 0.042:
-            await asyncio.sleep(0.42-exec_time)
+        if  exec_time < 0.4:
+            await asyncio.sleep(0.4-exec_time)
 
     
 

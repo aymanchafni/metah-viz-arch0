@@ -17,7 +17,7 @@ const App = () => {
     const plugin1 = {
        // id: "cc",
         beforeInit: function(chart) {
-        
+  
             // We get the chart data
             var data = chart.config.data;
             
@@ -31,21 +31,50 @@ const App = () => {
                 
                 // For every label ...
             for (var j = 0; j < x1.length; j++) {
-                const x = x1[j];
+                const x = x4[j];
                 // We get the dataset's function and calculate the value
                 var fct = data.datasets[0].function,
                     //affect x1 to data.labels
                     
-                    y = fct([x,x2[j],x3[j],x4[j]]);
+                    y = fct([x1[j],x2[j],x3[j],x]);
                 // Then we add the value to the dataset data
                 data.labels.push(x)
                 data.datasets[0].data.push(y);
                 
             }
         
+            
         }
     }; 
 
+    const RGB_Linear_Shade=(p,c)=>{
+        var i=parseInt,r=Math.round,[a,b,c,d]=c.split(","),P=p<0,t=P?0:255*p,P=P?1+p:1-p;
+        return"rgb"+(d?"a(":"(")+r(i(a[3]=="a"?a.slice(5):a.slice(4))*P+t)+","+r(i(b)*P+t)+","+r(i(c)*P+t)+(d?","+d:")");
+    };
+
+    const RGB_Log_Shade=(p,c)=>{
+        var i=parseInt,r=Math.round,[a,b,c,d]=c.split(","),P=p<0,t=P?0:p*255**2,P=P?1+p:1-p;
+        return"rgb"+(d?"a(":"(")+r((P*i(a[3]=="a"?a.slice(5):a.slice(4))**2+t)**0.5)+","+r((P*i(b)**2+t)**0.5)+","+r((P*i(c)**2+t)**0.5)+(d?","+d:")");
+    };
+
+    const generate_point_colors = (method, numberPt, startColor) =>{
+
+        var colors = [];
+        var c = startColor;
+        var p = 1/numberPt;
+        for(let i = 0; i < numberPt; i++){
+            colors.push(c);
+            c = method(p,c)
+
+        }
+
+        colors.reverse();
+
+        return colors;
+
+    };
+
+    const pointBackgroundColors =generate_point_colors(RGB_Log_Shade,100,"rgb(0, 255, 0)");
     const config = {
         
         plugins: [plugin1],
@@ -65,8 +94,9 @@ const App = () => {
                        { 
                         type: 'scatter',
                             label: "Metaheuristic",
-                            backgroundColor: 'rgb(255, 99, 132)',
-                            borderColor: 'rgb(255, 99, 132)',
+                            //backgroundColor: 'rgb(255, 99, 132)',
+                            pointBorderColor: pointBackgroundColors,
+                            pointBackgroundColor: pointBackgroundColors,
                             data: Array(1100).fill(null),
                             fill: false,
                             order:1
@@ -93,19 +123,21 @@ const App = () => {
             },
             scales: {
                 xAxes: [{
-                    display: true,
+                    display: false,
                     scaleLabel: {
-                        display: true,
+                        display: false,
                         labelString: 'X1'
                     }
                 }],
                 yAxes: [{
-                    display: true,
+                    display: false,
+                    max: 2000000,
                     scaleLabel: {
-                        display: true,
+                        display: false,
                         labelString: 'Score'
                     }
-                }]
+                }],
+                
             },
             plugins: {
                 zoom: {
@@ -132,9 +164,8 @@ const App = () => {
 
     var lineChart = new Chart(context, config);
 
-   
 
-
+ 
     const source = new EventSource("http://localhost:8000/chart-data");
     //api.EventSource = new EventSource("/chart-data");
     //source = api.EventSource;
@@ -149,7 +180,7 @@ const App = () => {
 
         } 
         
-        config.data.labels.splice(99,0,data.x[0]);
+        config.data.labels.splice(99,0,data.x[3]);
         config.data.datasets[1].data.splice(99,0,data.fx);
         config.data.datasets[0].data.splice(99,0,null);
 
