@@ -7,21 +7,42 @@ const App = () => {
     };
 
     
-    //const [streamdata, setStreamData] = useState(null);
- 
-
-
+   
 
    
   
     return (
-    
-      <FxChart
-              fx={fx} 
-              //index={0} 
-              //newData={streamdata}   
-      />
-  
+      <frameElement rows="250px, 250px" cols="250px, 250px">
+          <frameElement>
+              <FxChart
+                    fx={fx} 
+                    dim={0} 
+                      
+              />
+          </frameElement>
+
+          <frameElement>
+              <FxChart
+                        fx={fx} 
+                        dim={1} 
+                  />
+          </frameElement>
+
+          <frameElement>
+              <FxChart
+                        fx={fx} 
+                        dim={2} 
+                  />
+          </frameElement>
+
+          <frameElement>
+              <FxChart
+                        fx={fx} 
+                        dim={3} 
+                  />
+          </frameElement>
+      
+      </frameElement>
   
   );
 

@@ -29,8 +29,7 @@ ChartJS.register(
   zoomPlugin
 );
 
-const FxChart = ({fx}) => {
-
+const FxChart = ({fx, dim}) => {
 
     const pointBackgroundColors =generate_point_colors(RGB_Log_Shade,100,"rgb(0, 255, 0)");
 
@@ -68,33 +67,29 @@ const FxChart = ({fx}) => {
                                         }
                                     },
                                     order:1
-                                    
+                                     
                                 } 
                 
                 ],
                 };
              
              //create function vars
-             let x1 = Array.from({length: len0}, () => Math.random() * 300);
-             let x2 = Array.from({length: len0}, () => Math.random() * 300);
-             let x3 = Array.from({length: len0}, () => Math.random() * 300);
-             let x4 = Array.from({length: len0}, () => Math.random() * 300);
- 
-             //x1 = quickSort(x1);  
-             //x2 = quickSort(x2);
-             //x3 = quickSort(x3);
-             x4 = quickSort(x4);
+             let x = Array.from({length: len0}, () => new Array(3).fill(Math.random() * 300));
+
+             let xDim = Array.from({length: len0}, () => Math.random() * 300);
+
+             xDim = quickSort(xDim);
+
+             x = x.map((elem,index) => {
+                elem.splice(dim,0,xDim[index]);
+                return elem;
+             });
  
                  // For every label ...
              for (let j = 0; j < len0; j++) {
-                 const x = x4[j];
-                 // We get the dataset's function and calculate the value
-                     //affect x1 to data.labels
-                     
-                 const y = fct([x1[j],x2[j],x3[j],x]);
-                 // Then we add the value to the dataset data
-                 initialData.labels.push(x);
-                 initialData.datasets[0].data.push(y);
+  
+                 initialData.labels.push(xDim[j]);
+                 initialData.datasets[0].data.push(fct(x[j]));
                  
              }
              
@@ -106,6 +101,47 @@ const FxChart = ({fx}) => {
 
     const [currentData, setCurrentData] = useState(initialData);
 
+ 
+
+
+    const source = new EventSource("http://localhost:8000/chart-data");
+
+    source.onmessage = function (event) {
+            
+      const newData = JSON.parse(event.data);
+      setCurrentData((oldData) => {
+        if(newData == null){
+            return;
+        };
+
+        const updatedData = structuredClone(oldData);
+        
+        updatedData.labels.shift();
+        updatedData.datasets[1].data.shift();
+        updatedData.datasets[0].data.shift();
+
+        updatedData.labels.splice(99,0,newData.x[dim]);
+        updatedData.datasets[1].data.splice(99,0,newData.fx);
+        updatedData.datasets[0].data.splice(99,0,null);
+
+        const labels = updatedData.labels.slice(100);
+
+        var index = labels.length;
+        for(let i=0; i<labels.length; i++){
+            if(labels[i] > newData.x[dim]){
+                index = i;
+                break;
+            };
+        };
+       
+        updatedData.labels.splice(100+index,0,newData.x[dim]);
+        updatedData.datasets[0].data.splice(100+index,0,newData.fx);
+        updatedData.datasets[1].data.push(null);
+        return updatedData;
+    });
+
+    }
+   
 
     const decimation = {
         enabled: true,
@@ -180,88 +216,6 @@ const FxChart = ({fx}) => {
            }
      };
   
-
-
-
-
-    /*    const update_chart_data = (oldData, newData) =>{
-
-            if(newData == null){
-                return;
-            };
-
-            const updatedData = structuredClone(oldData);
-            
-            updatedData.labels.shift();
-            updatedData.datasets[1].data.shift();
-            updatedData.datasets[0].data.shift();
-    
-            updatedData.labels.splice(99,0,newData.x[3]);
-            updatedData.datasets[1].data.splice(99,0,newData.fx);
-            updatedData.datasets[0].data.splice(99,0,null);
-    
-            const labels = updatedData.labels.slice(100);
-    
-            var index = labels.length;
-            for(let i=0; i<labels.length; i++){
-                if(labels[i] > newData.x[3]){
-                    index = i;
-                    break;
-                };
-            };
-           
-            updatedData.labels.splice(100+index,0,newData.x[3]);
-            updatedData.datasets[0].data.splice(100+index,0,newData.fx);
-            updatedData.datasets[1].data.push(null);
-    
-            setCurrentData(updatedData);
-        };
-    */
-    
-    const source = new EventSource("http://localhost:8000/chart-data");
-    
-   
-
-        source.onmessage = function (event) {
-            
-            const newData = JSON.parse(event.data);
-            
-            setCurrentData((oldData) => {
-                if(newData == null){
-                    return;
-                };
-    
-                const updatedData = structuredClone(oldData);
-                
-                updatedData.labels.shift();
-                updatedData.datasets[1].data.shift();
-                updatedData.datasets[0].data.shift();
-        
-                updatedData.labels.splice(99,0,newData.x[3]);
-                updatedData.datasets[1].data.splice(99,0,newData.fx);
-                updatedData.datasets[0].data.splice(99,0,null);
-        
-                const labels = updatedData.labels.slice(100);
-        
-                var index = labels.length;
-                for(let i=0; i<labels.length; i++){
-                    if(labels[i] > newData.x[3]){
-                        index = i;
-                        break;
-                    };
-                };
-               
-                updatedData.labels.splice(100+index,0,newData.x[3]);
-                updatedData.datasets[0].data.splice(100+index,0,newData.fx);
-                updatedData.datasets[1].data.push(null);
-                return updatedData;
-            });
-            
-     
-        }; 
-
-
-    
 
     
 
