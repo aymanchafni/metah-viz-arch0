@@ -26,7 +26,7 @@ ChartJS.register(
   Tooltip,
   Legend,
   plugins,
-  zoomPlugin
+  //zoomPlugin
 );
 
 const FxChart = ({fx, dim}) => {
@@ -103,14 +103,22 @@ const FxChart = ({fx, dim}) => {
 
  
 
-
+    
     const source = new EventSource("http://localhost:8000/chart-data");
 
+    source.onerror = (error) => {
+        console.error('EventSource failed', error)
+        source.close()
+    }
+
     source.onmessage = function (event) {
+
             
       const newData = JSON.parse(event.data);
+
       setCurrentData((oldData) => {
         if(newData == null){
+            
             return;
         };
 
@@ -126,7 +134,7 @@ const FxChart = ({fx, dim}) => {
 
         const labels = updatedData.labels.slice(100);
 
-        var index = labels.length;
+        let index = labels.length;
         for(let i=0; i<labels.length; i++){
             if(labels[i] > newData.x[dim]){
                 index = i;
@@ -176,7 +184,7 @@ const FxChart = ({fx, dim}) => {
                  type: 'linear',
                  title: {
                      display: true,
-                     text: 'X1'
+                     text: 'X'+dim
                  },
                  
              },

@@ -12,38 +12,45 @@ const App = () => {
    
   
     return (
-      <frameElement rows="250px, 250px" cols="250px, 250px">
-          <frameElement>
-              <FxChart
-                    fx={fx} 
-                    dim={0} 
-                      
-              />
-          </frameElement>
+            <div className="container-fluid">
 
-          <frameElement>
-              <FxChart
-                        fx={fx} 
-                        dim={1} 
-                  />
-          </frameElement>
+              <div className="row row-cols-2">
 
-          <frameElement>
-              <FxChart
-                        fx={fx} 
-                        dim={2} 
+                <div className="col">
+                  <FxChart
+                      fx={fx}
+                      dim={0}
                   />
-          </frameElement>
+                </div>
 
-          <frameElement>
-              <FxChart
-                        fx={fx} 
-                        dim={3} 
+                <div className="col">
+                  <FxChart
+                      fx={fx}
+                      dim={1}
                   />
-          </frameElement>
-      
-      </frameElement>
-  
+                </div>
+
+
+
+                <div className="col">
+                <FxChart
+                      fx={fx}
+                      dim={2}
+                  />
+                </div>
+
+                <div className="col">
+                <FxChart
+                      fx={fx}
+                      dim={3}
+                  />
+                </div>
+
+                </div>
+
+              
+
+            </div>  
   );
 
 
