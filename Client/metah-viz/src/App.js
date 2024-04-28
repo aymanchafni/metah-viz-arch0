@@ -8,7 +8,7 @@ const App = () => {
     const fx = (x) => { return 1.7781*0.625*x[1]*x[2]**2 + 0.6224*0.625*x[0]*x[2]*x[3] + 3.1661*(0.625*x[0])**2*x[3] + 19.84*(0.625*x[0])**2*x[2]
     };
 
-    const pointBackgroundColors =generate_point_colors(RGB_Log_Shade,100,"rgb(0, 255, 0)");
+    const pointBackgroundColors =generate_point_colors(RGB_Log_Shade,101,"rgb(0, 255, 0)");
 
     
     const initialize_data = (fct,len0,len1) => {
@@ -86,7 +86,7 @@ const App = () => {
              
          };
      
-    const initialData = initialize_data(fx,1000,100);
+    const initialData = initialize_data(fx,1000,101);
 
     const [currentData, setCurrentData] = useState(initialData);
 
@@ -114,6 +114,7 @@ const App = () => {
         const updatedData = structuredClone(oldData);
 
         for(let dim=0;dim<4;dim++){
+
               updatedData[dim].labels.shift();
               updatedData[dim].datasets[1].data.shift();
               updatedData[dim].datasets[0].data.shift();
@@ -122,7 +123,13 @@ const App = () => {
               updatedData[dim].datasets[1].data.splice(99,0,newData.fx);
               updatedData[dim].datasets[0].data.splice(99,0,null);
 
-              const labels = updatedData[dim].labels.slice(100);
+              const min = updatedData[dim].datasets[1].data[100]; 
+              if(newData.fx < min || min == null) {
+                updatedData[dim].labels.splice(100,1,newData.x[dim]);
+                updatedData[dim].datasets[1].data.splice(100,1,newData.fx);
+              }
+
+              const labels = updatedData[dim].labels.slice(101);
 
               let index = labels.length;
               for(let i=0; i<labels.length; i++){
@@ -132,8 +139,8 @@ const App = () => {
                   };
               };
             
-              updatedData[dim].labels.splice(100+index,0,newData.x[dim]);
-              updatedData[dim].datasets[0].data.splice(100+index,0,newData.fx);
+              updatedData[dim].labels.splice(101+index,0,newData.x[dim]);
+              updatedData[dim].datasets[0].data.splice(101+index,0,newData.fx);
               updatedData[dim].datasets[1].data.push(null);
         }
         

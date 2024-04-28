@@ -14,13 +14,14 @@ export const generate_point_colors = (method, numberPt, startColor) =>{
     var colors = [];
     var c = startColor;
     var p = 1/numberPt;
-    for(let i = 0; i < numberPt; i++){
+    for(let i = 0; i < numberPt-1; i++){
         colors.push(c);
         c = method(p,c)
 
     }
 
     colors.reverse();
+    colors.push("rgb(75,0,130)");
 
     return colors;
 
