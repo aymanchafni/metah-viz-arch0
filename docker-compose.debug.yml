@@ -1,0 +1,24 @@
+version: '3.4'
+
+services:
+  metahviz-front:
+    image: metahviz-front
+    build:
+      context: Client/metah-viz
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3000:3000
+      - 9229:9229
+    command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+
+  metahviz-server:
+    image: metahviz-server
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: ["sh", "-c", "pip install debugpy -t /tmp && python /tmp/debugpy --wait-for-client --listen 0.0.0.0:5678 -m uvicorn Server.main:app --host 0.0.0.0 --port 8000"]
+    ports:
+      - 8000:8000
+      - 5678:5678
