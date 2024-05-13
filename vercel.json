@@ -1,6 +1,6 @@
 {
 
-    "buildCommand": "cd Client/metah-viz && run build && cd ../../Server && gunicorn --bind 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker main:app",
+    "buildCommand": "cd Client/metah-viz && npm run build && cd ../../Server && gunicorn --bind 0.0.0.0:8000 -k uvicorn.workers.UvicornWorker main:app",
     "installCommand": "cd Client/metah-viz && npm install && cd ../../Server && python3.12 -m pip freeze > requirements.txt",
     "outputDirectory": "/Client/metah-viz/public",
     "rewrites": [{ "source": "/(.*)", "destination": "/Server/main.py" }]
