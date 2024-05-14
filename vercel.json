@@ -1,10 +1,11 @@
 {
 
     
-    "installCommand": "cd Client/metah-viz && npm install && cd ../../Server && python3.12 -m pip freeze > requirements.txt",
+    "installCommand": "cd Client/metah-viz && npm install && cd ../../api && python3.12 -m pip install -r requirements.txt",
 
-    "buildCommand": "cd ../Client/metah-viz && npm run build && cd ../../Server && uvicorn main:app --reload",
+    "buildCommand": "cd Client/metah-viz && npm run build",
 
-    "outputDirectory": "/Client/metah-viz/public",
-    "rewrites": [{ "source": "/(.*)", "destination": "/Server/main.py" }]
+    "outputDirectory": "Client/metah-viz/build",
+    
+    "rewrites": [{ "source": "/(.*)", "destination": "/api/main.py" }]
   }

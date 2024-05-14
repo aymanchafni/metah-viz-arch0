@@ -14,6 +14,8 @@ import time
 from metaheuristics.Optimizer import Optimizer
 import numpy as np
 
+
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -101,3 +103,8 @@ async def chart_data(request: Request) -> StreamingResponse:
     response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Accel-Buffering"] = "no"
     return response
+
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=3000, reload=True)
