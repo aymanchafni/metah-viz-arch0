@@ -1,0 +1,19 @@
+{
+
+  "env": {
+    "PYTHONPATH": "api/"
+},
+
+
+    "outputDirectory": "build",
+    
+    "rewrites": [{ "source": "/api/:path*", "destination": "api/main" }],
+
+    "functions": {
+   
+      "api/*.py": {
+        "maxDuration": 60 
+    }
+  }
+
+}

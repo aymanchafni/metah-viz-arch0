@@ -93,11 +93,20 @@ const App = () => {
  
 
     
-    const source = new EventSource("http://localhost:8000/chart-data");
+    let source = new EventSource("http://localhost:8000/api/chart-data");
 
     source.onerror = (error) => {
-        console.error('EventSource failed', error)
-        source.close()
+        console.error('EventSource failed', error);
+        source.close();
+        
+        source = new EventSource("/api/chart-data");
+        
+        source.onerror = (error) => {
+            console.error('EventSource failed', error);
+            source.close();
+        }
+        
+        
     }
 
     source.onmessage = function (event) {

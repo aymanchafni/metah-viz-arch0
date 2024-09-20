@@ -1,5 +1,5 @@
 
-from Optimizer import Optimizer
+from optimizer import Optimizer
 
 
 class Random(Optimizer):

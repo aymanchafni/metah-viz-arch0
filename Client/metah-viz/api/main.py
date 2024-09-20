@@ -11,9 +11,7 @@ import sys
 from datetime import datetime
 from typing import Iterator
 import time
-from metaheuristics.Optimizer import Optimizer
-import numpy as np
-
+from metaheuristics.optimizer import Optimizer
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -21,33 +19,35 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-@app.get('/')
+@app.get('/api')
 async def check():
     return 'hello mf'
 
-origins = [
-    "http://localhost:3000"
-]
+origins = ['http://localhost:3000', 'http://127.0.0.1:3000',
+           'https://localhost:3000', 'https://127.0.0.1:3000'] 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
+    expose_headers=[ "X-Experimental-Stream-Data"],
 )
 
 
 
-async def generate_random_data(request: Request) -> Iterator[str]:
+def generate_random_data() -> Iterator[str]:
     """
     Generates random value between 0 and 100
 
     :return: String containing current timestamp (YYYY-mm-dd HH:MM:SS) and randomly generated data.
     """
-    client_ip = request.client.host
+    #client_ip = request.client.host
 
-    logger.info("Client %s connected", client_ip)
+    #logger.info("Client %s connected", client_ip)
+
+    i= 0
 
     while True:
         json_data = json.dumps(
@@ -57,7 +57,8 @@ async def generate_random_data(request: Request) -> Iterator[str]:
             }
         )
         yield f"data:{json_data}\n\n"
-        await asyncio.sleep(1)
+        time.sleep(1)
+        i+=1
 
 def fx(x):
             return 1.7781*0.625*x[1]*x[2]**2 + 0.6224*0.625*x[0]*x[2]*x[3] + 3.1661*(0.625*x[0])**2*x[3] + 19.84*(0.625*x[0])**2*x[2]
@@ -65,11 +66,11 @@ def fx(x):
 
 meta1 = Optimizer(fx,[],"random","monte",100,100)
 
-async def generate_metaheuristic_points(request: Request, metaheuristic: Optimizer) -> Iterator[str]:
+async def generate_metaheuristic_points(metaheuristic: Optimizer) -> Iterator[str]:
 
-    client_ip = request.client.host
+    #client_ip = request.client.host
 
-    logger.info("Client %s connected", client_ip)
+    #logger.info("Client %s connected", client_ip)
 
     curr_pt,best_pt = metaheuristic.iterate(10,[],[])
 
@@ -89,22 +90,33 @@ async def generate_metaheuristic_points(request: Request, metaheuristic: Optimiz
         yield f"data:{json_data}\n\n"
         
         exec_time = time.time() - start_time
-        if  exec_time < 0.2:
-            await asyncio.sleep(0.2-exec_time)
+        if  exec_time < 2:
+            await asyncio.sleep(2-exec_time)
 
     
 
+@app.get("/api/random-data")
+def random_data() -> StreamingResponse:
+    response = StreamingResponse(generate_random_data(), media_type="text/event-stream")
+    #response.headers["Cache-Control"] = "no-cache"
+    #response.headers["X-Accel-Buffering"] = "no"
+    response.headers['Content-Type'] = 'text/event-stream'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    
+
+    return response
 
 
-
-@app.get("/chart-data")
-async def chart_data(request: Request) -> StreamingResponse:
-    response = StreamingResponse(generate_metaheuristic_points(request,meta1), media_type="text/event-stream")
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["X-Accel-Buffering"] = "no"
+@app.get("/api/chart-data")
+async def chart_data() -> StreamingResponse:
+    response = StreamingResponse(generate_metaheuristic_points(meta1), media_type="text/event-stream")
+    #response.headers["Cache-Control"] = "no-cache"
+    #response.headers["X-Accel-Buffering"] = "no"
+    response.headers['Content-Type'] = 'text/event-stream'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=3000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
